@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	AZ = "https://github.com/ItsMyEyes/az"
+	AZ = "xxx"
 )
 
 func AddModule(dir, name string) error {
