@@ -34,18 +34,22 @@ func main() {
 	app.Name = "ikiyora"
 	app.Usage = "run ikiyora"
 	app.Author = "ItsMyEyes - Andi"
-	app.UsageText = "ikiyora [global options] command [command options] [arguments...]"
+	app.UsageText = "ikiyora [command] [arguments...]"
 	app.Version = fmt.Sprintf("%s built on %s (commit: %s)", Version, BuildDate, Commit)
 	app.Description = "IKiyora is a installation tool for Kiyora"
 	app.Commands = []cli.Command{
 		{
 			Name:        "create",
 			Description: "Creating a new project",
+			UsageText:   "Creating a new project",
+			Usage:       "Creating a new project",
 			Action:      createProject,
 		},
 		{
 			Name:        "add",
 			Description: "Add Module / Adapter",
+			UsageText:   "Add Module / Adapter",
+			Usage:       "Add Module / Adapter",
 			Action:      addModule,
 		},
 	}
