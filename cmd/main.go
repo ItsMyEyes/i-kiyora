@@ -9,6 +9,7 @@ import (
 	"github.com/ItsMyEyes/install_kiyora/dto"
 	"github.com/ItsMyEyes/install_kiyora/handlers"
 	"github.com/ItsMyEyes/install_kiyora/utils"
+	"github.com/urfave/cli"
 )
 
 var (
@@ -20,9 +21,31 @@ var (
 	ProjectLink                = "https://github.com/ItsMyEyes/kiyora_v2.git"
 	Replace                    = "github.com/ItsMyEyes/kiyora_v2"
 	MinimalVersionGolangInt, _ = strconv.Atoi(strings.Replace(MinimalVersionGolang, ".", "", -1))
+	BuildDate                  = "2023-06-19"
+	Commit                     = "now"
 )
 
 func main() {
+
+	app := cli.NewApp()
+	app.Name = "ikiyora"
+	app.Usage = "run ikiyora"
+	app.Author = "ItsMyEyes - Andi"
+	app.UsageText = "ikiyora [global options] command [command options] [arguments...]"
+	app.Version = fmt.Sprintf("%s built on %s (commit: %s)", Version, BuildDate, Commit)
+	app.Description = "IKiyora is a installation tool for Kiyora"
+	app.Commands = []cli.Command{
+		{
+			Name:        "create",
+			Description: "Creating a new project",
+			Action:      creatProject,
+		},
+	}
+
+	app.Run(os.Args)
+}
+
+func creatProject(_ *cli.Context) {
 	var appCli dto.Cli
 	handlers.Logo(Kiyora, Version)
 
