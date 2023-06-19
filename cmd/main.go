@@ -81,9 +81,9 @@ func addModule(ctx *cli.Context) {
 		os.Exit(0)
 	}
 
-	s.Suffix = " Creating a new adapter..."
+	s.Suffix = " Download a new adapter..."
 	s.Start()
-	err = handlers.AddModule(adapter, moduleName)
+	err = handlers.AddModule(dir, moduleName)
 	if err != nil {
 		s.Stop()
 		fmt.Printf("Error adding module: %s\n", err.Error())
@@ -96,8 +96,12 @@ func addModule(ctx *cli.Context) {
 		fmt.Printf("Error replacing text in folder: %s\n", err.Error())
 		return
 	}
-
 	fmt.Println("Text replacement completed.")
+
+	s.Start()
+	s.Suffix = " Running tidy..."
+	handlers.RunningTidy(dir)
+	s.Stop()
 
 	utils.MakeLine()
 

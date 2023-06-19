@@ -30,7 +30,15 @@ func GetNameModule(dir string) string {
 
 func azModule(dir string) error {
 	fmt.Println("📦 Installing AZ Module")
-	CloningProject(AZ, dir+"\\az")
+	if !utils.CheckDir(dir + "\\pkg\\logger") {
+		return errors.New("Module az cant install because logger")
+	}
+
+	if !utils.CheckDir(dir + "\\pkg\\utils") {
+		return errors.New("Module az cant install because utils")
+	}
+
+	CloningProject(AZ, dir+"\\adapter\\az")
 
 	return nil
 }
