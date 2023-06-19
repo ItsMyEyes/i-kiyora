@@ -33,6 +33,10 @@ func ReplaceTextInFolder(rootFolder, oldText, newText string) error {
 			return err
 		}
 
+		if strings.Contains(path, ".git") {
+			return nil
+		}
+
 		// Skip directories
 		if info.IsDir() {
 			return nil

@@ -26,7 +26,7 @@ func RunnigMod(dir string, mod string) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Sucess running " + out.String())
+	fmt.Println("✅ Sucess running Mod" + out.String())
 }
 
 func RunningTidy(dir string) {
@@ -42,7 +42,7 @@ func RunningTidy(dir string) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Sucess running " + out.String())
+	fmt.Println("\n ✅ Sucess running tidy" + out.String())
 }
 
 func CloningProject(project string, nameProject string) {
@@ -57,7 +57,7 @@ func CloningProject(project string, nameProject string) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Sucess cloning" + out.String())
+	fmt.Println("\n ✅ Sucess cloning" + out.String())
 }
 
 func Logo(Name string, Version string) {

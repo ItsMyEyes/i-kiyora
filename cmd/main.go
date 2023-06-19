@@ -5,10 +5,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ItsMyEyes/install_kiyora/dto"
 	"github.com/ItsMyEyes/install_kiyora/handlers"
 	"github.com/ItsMyEyes/install_kiyora/utils"
+	"github.com/briandowns/spinner"
 	"github.com/urfave/cli"
 )
 
@@ -23,10 +25,11 @@ var (
 	MinimalVersionGolangInt, _ = strconv.Atoi(strings.Replace(MinimalVersionGolang, ".", "", -1))
 	BuildDate                  = "2023-06-19"
 	Commit                     = "now"
+
+	s = spinner.New(spinner.CharSets[11], 300*time.Millisecond)
 )
 
 func main() {
-
 	app := cli.NewApp()
 	app.Name = "ikiyora"
 	app.Usage = "run ikiyora"
@@ -38,14 +41,73 @@ func main() {
 		{
 			Name:        "create",
 			Description: "Creating a new project",
-			Action:      creatProject,
+			Action:      createProject,
+		},
+		{
+			Name:        "add",
+			Description: "Add Module / Adapter",
+			Action:      addModule,
 		},
 	}
 
 	app.Run(os.Args)
 }
 
-func creatProject(_ *cli.Context) {
+func addModule(ctx *cli.Context) {
+	args := ctx.Args()
+	if len(args) == 0 {
+		fmt.Println("You have not entered a module name.")
+		os.Exit(0)
+	}
+
+	moduleName := args[0]
+
+	dir, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("Error getting current directory: %s\n", err.Error())
+		return
+	}
+	adapter := dir + "\\adapter"
+	projectName := handlers.GetNameModule(dir)
+	// check directory cli running
+	if !utils.CheckDir(adapter) {
+		fmt.Println("❌ Project not found. Please run this command in the project directory.")
+		os.Exit(0)
+	}
+
+	// check directory adapter
+	if utils.CheckDir(adapter + "\\" + moduleName) {
+		fmt.Println("❌ Adapter already exists.")
+		os.Exit(0)
+	}
+
+	s.Suffix = " Creating a new adapter..."
+	s.Start()
+	err = handlers.AddModule(adapter, moduleName)
+	if err != nil {
+		s.Stop()
+		fmt.Printf("Error adding module: %s\n", err.Error())
+		return
+	}
+	s.Stop()
+
+	err = utils.ReplaceTextInFolder(adapter, Replace, projectName)
+	if err != nil {
+		fmt.Printf("Error replacing text in folder: %s\n", err.Error())
+		return
+	}
+
+	fmt.Println("Text replacement completed.")
+
+	utils.MakeLine()
+
+	fmt.Println("Your project is ready to use.")
+	fmt.Println("✅ You can check it")
+
+	utils.MakeLine()
+}
+
+func createProject(_ *cli.Context) {
 	var appCli dto.Cli
 	handlers.Logo(Kiyora, Version)
 
@@ -94,20 +156,26 @@ func creatProject(_ *cli.Context) {
 		os.Exit(0)
 	}
 
-	fmt.Println("Creating a new project...")
+	s.Start()
+	s.Suffix = " Creating a new project..."
 	if !utils.CheckDir(appCli.PathProject()) {
 		fmt.Println("Cloning project... ", appCli.PathProject())
 		handlers.CloningProject(ProjectLink, appCli.PathProject())
+		s.Stop()
 	} else {
 		fmt.Println("Project already exists")
 		os.Exit(0)
 	}
 
-	fmt.Println("Removing .git folder...")
+	s.Start()
+	s.Suffix = " Removing .git folder..."
 	utils.RemoveFolder(fmt.Sprintf("%s\\.git", appCli.PathProject()))
+	s.Stop()
 
-	fmt.Println("Copying file...")
+	s.Start()
+	s.Suffix = " Copying file..."
 	utils.CopyFile(fmt.Sprintf("%s\\app.yaml.example", appCli.PathProject()), fmt.Sprintf("%s\\app.yaml", appCli.PathProject()))
+	s.Stop()
 
 	err := utils.ReplaceTextInFolder(appCli.PathProject(), Replace, appCli.ModuleProject())
 	if err != nil {
@@ -117,12 +185,20 @@ func creatProject(_ *cli.Context) {
 
 	fmt.Println("Text replacement completed.")
 
-	fmt.Println("Running mod...")
+	err = utils.ReplaceTextInFolder(appCli.PathProject(), "services_name", appCli.NameModule())
+	if err != nil {
+		fmt.Printf("Error replacing text in folder: %s\n", err.Error())
+		return
+	}
+
+	fmt.Println("Text replacement completed.")
+
 	handlers.RunnigMod(appCli.PathProject(), appCli.ModuleProject())
 
-	fmt.Println("Running tidy...")
+	s.Start()
+	s.Suffix = " Running tidy..."
 	handlers.RunningTidy(appCli.PathProject())
-
+	s.Stop()
 	utils.MakeLine()
 
 	fmt.Println("Your project is ready to use.")

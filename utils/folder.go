@@ -34,6 +34,27 @@ func CopyFile(src, dst string) error {
 	return err
 }
 
+func ReadFile(path string) []byte {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bs := make([]byte, stat.Size())
+	_, err = file.Read(bs)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return bs
+}
+
 func CheckDir(dir string) bool {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		return false
