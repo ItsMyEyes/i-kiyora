@@ -3,6 +3,8 @@ package dto
 import (
 	"fmt"
 	"strings"
+
+	"github.com/ItsMyEyes/install_kiyora/utils"
 )
 
 type Cli struct {
@@ -23,5 +25,6 @@ func (c *Cli) ModuleProject() string {
 }
 
 func (c *Cli) PathProject() string {
-	return fmt.Sprintf("%s\\%s", c.GoPath, c.NameModule())
+	// return fmt.Sprintf("%s%s%s", c.GoPath, utils.GetPathSlash(), c.NameModule())
+	return utils.MakeDirectoryString(c.GoPath, c.NameModule())
 }

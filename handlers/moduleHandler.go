@@ -21,7 +21,7 @@ func AddModule(dir, name string) error {
 }
 
 func GetNameModule(dir string) string {
-	read := utils.ReadFile(dir + "\\go.mod")
+	read := utils.ReadFile(utils.MakeDirectoryString(dir, "go.mod"))
 	mod := string(read)
 	mods := strings.Split(mod, "\n")
 	mod = strings.Replace(mods[0], "module ", "", -1)
@@ -30,15 +30,15 @@ func GetNameModule(dir string) string {
 
 func azModule(dir string) error {
 	fmt.Println("📦 Installing AZ Module")
-	if !utils.CheckDir(dir + "\\pkg\\logger") {
+	if !utils.CheckDir(utils.MakeDirectoryString(dir, "pkg", "logger")) {
 		return errors.New("Module az cant install because logger")
 	}
 
-	if !utils.CheckDir(dir + "\\pkg\\utils") {
+	if !utils.CheckDir(utils.MakeDirectoryString(dir, "pkg", "utils")) {
 		return errors.New("Module az cant install because utils")
 	}
 
-	CloningProject(AZ, dir+"\\adapter\\az")
+	CloningProject(AZ, utils.MakeDirectoryString(dir, "pkg", "az"))
 
 	return nil
 }

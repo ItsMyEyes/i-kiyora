@@ -37,3 +37,18 @@ func MakeLine() {
 	}
 	fmt.Println("\n" + line + "\n")
 }
+
+func getPathSlash() string {
+	if os.PathSeparator == '\\' {
+		return "\\"
+	}
+	return "/"
+}
+
+func MakeDirectoryString(dir ...string) string {
+	var result string
+	for _, d := range dir {
+		result += d + getPathSlash()
+	}
+	return result
+}

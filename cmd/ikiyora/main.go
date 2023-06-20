@@ -71,7 +71,8 @@ func addModule(ctx *cli.Context) {
 		fmt.Printf("Error getting current directory: %s\n", err.Error())
 		return
 	}
-	adapter := dir + "\\adapter"
+	// adapter := dir + utils.GetPathSlash() + "adapter"
+	adapter := utils.MakeDirectoryString(dir, "adapter")
 	projectName := handlers.GetNameModule(dir)
 	// check directory cli running
 	if !utils.CheckDir(adapter) {
@@ -80,7 +81,7 @@ func addModule(ctx *cli.Context) {
 	}
 
 	// check directory adapter
-	if utils.CheckDir(adapter + "\\" + moduleName) {
+	if utils.CheckDir(utils.MakeDirectoryString(adapter, moduleName)) {
 		fmt.Println("❌ Adapter already exists.")
 		os.Exit(0)
 	}
@@ -177,12 +178,14 @@ func createProject(_ *cli.Context) {
 
 	s.Start()
 	s.Suffix = " Removing .git folder..."
-	utils.RemoveFolder(fmt.Sprintf("%s\\.git", appCli.PathProject()))
+	// utils.RemoveFolder(fmt.Sprintf("%s%s.git", utils.GetPathSlash(), appCli.PathProject()))
+	utils.RemoveFolder(utils.MakeDirectoryString(appCli.PathProject(), ".git"))
 	s.Stop()
 
 	s.Start()
 	s.Suffix = " Copying file..."
-	utils.CopyFile(fmt.Sprintf("%s\\app.yaml.example", appCli.PathProject()), fmt.Sprintf("%s\\app.yaml", appCli.PathProject()))
+	// utils.CopyFile(fmt.Sprintf("%s%sapp.yaml.example", utils.GetPathSlash(), appCli.PathProject()), fmt.Sprintf("%s%sapp.yaml", utils.GetPathSlash(), appCli.PathProject()))
+	utils.CopyFile(utils.MakeDirectoryString(appCli.PathProject(), "app.yaml.example"), utils.MakeDirectoryString(appCli.PathProject(), "app.yaml"))
 	s.Stop()
 
 	err := utils.ReplaceTextInFolder(appCli.PathProject(), Replace, appCli.ModuleProject())
