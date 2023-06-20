@@ -47,9 +47,9 @@ func main() {
 		},
 		{
 			Name:        "add",
-			Description: "Add Module / Adapter",
-			UsageText:   "Add Module / Adapter",
-			Usage:       "Add Module / Adapter",
+			Description: "Add Module / Adapters",
+			UsageText:   "Add Module / Adapters",
+			Usage:       "Add Module / Adapters",
 			Action:      addModule,
 		},
 	}
