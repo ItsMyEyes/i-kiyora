@@ -34,11 +34,15 @@ func azModule(dir string) error {
 		return errors.New("Module az cant install because logger")
 	}
 
-	if !utils.CheckDir(utils.MakeDirectoryString(dir, "pkg", "utils")) {
+	if !utils.CheckDir(utils.MakeDirectoryString(dir, "pkg", "util")) {
 		return errors.New("Module az cant install because utils")
 	}
 
-	CloningProject(AZ, utils.MakeDirectoryString(dir, "pkg", "az"))
+	if !utils.CheckDir(utils.MakeDirectoryString(dir, "adapter", "az")) {
+		return errors.New("Module az cant install because you already have az module")
+	}
+
+	CloningProject(AZ, utils.MakeDirectoryString(dir, "adapter", "az"))
 
 	return nil
 }
