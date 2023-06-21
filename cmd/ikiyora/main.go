@@ -185,8 +185,10 @@ func createProject(_ *cli.Context) {
 
 	fmt.Println("Text replacement completed.")
 
+	fmt.Println("Running Mod...")
 	handlers.RunnigMod(appCli.PathProject(), appCli.ModuleProject())
 
+	fmt.Println("Running Tidy...")
 	handlers.RunningTidy(appCli.PathProject())
 	utils.MakeLine()
 
