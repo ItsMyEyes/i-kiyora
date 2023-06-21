@@ -47,7 +47,11 @@ func getPathSlash() string {
 
 func MakeDirectoryString(dir ...string) string {
 	var result string
-	for _, d := range dir {
+	for i, d := range dir {
+		if i == len(dir)-1 {
+			result += d
+			break
+		}
 		result += d + getPathSlash()
 	}
 	return result
