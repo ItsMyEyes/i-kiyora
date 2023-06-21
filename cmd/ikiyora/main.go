@@ -5,12 +5,10 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/ItsMyEyes/install_kiyora/dto"
 	"github.com/ItsMyEyes/install_kiyora/handlers"
 	"github.com/ItsMyEyes/install_kiyora/utils"
-	"github.com/briandowns/spinner"
 	"github.com/urfave/cli"
 )
 
@@ -25,8 +23,6 @@ var (
 	MinimalVersionGolangInt, _ = strconv.Atoi(strings.Replace(MinimalVersionGolang, ".", "", -1))
 	BuildDate                  = "2023-06-19"
 	Commit                     = "now"
-
-	s = spinner.New(spinner.CharSets[11], 300*time.Millisecond)
 )
 
 func main() {
@@ -86,15 +82,11 @@ func addModule(ctx *cli.Context) {
 		os.Exit(0)
 	}
 
-	s.Suffix = " Download a new adapter..."
-	s.Start()
 	err = handlers.AddModule(dir, moduleName)
 	if err != nil {
-		s.Stop()
 		fmt.Printf("Error adding module: %s\n", err.Error())
 		return
 	}
-	s.Stop()
 
 	err = utils.ReplaceTextInFolder(adapter, Replace, projectName)
 	if err != nil {
@@ -103,10 +95,7 @@ func addModule(ctx *cli.Context) {
 	}
 	fmt.Println("Text replacement completed.")
 
-	s.Start()
-	s.Suffix = " Running tidy..."
 	handlers.RunningTidy(dir)
-	s.Stop()
 
 	utils.MakeLine()
 
@@ -165,28 +154,20 @@ func createProject(_ *cli.Context) {
 		os.Exit(0)
 	}
 
-	s.Start()
-	s.Suffix = " Creating a new project..."
 	if !utils.CheckDir(appCli.PathProject()) {
 		fmt.Println("Cloning project... ", appCli.PathProject())
 		handlers.CloningProject(ProjectLink, appCli.PathProject())
-		s.Stop()
+
 	} else {
 		fmt.Println("Project already exists")
 		os.Exit(0)
 	}
 
-	s.Start()
-	s.Suffix = " Removing .git folder..."
 	// utils.RemoveFolder(fmt.Sprintf("%s%s.git", utils.GetPathSlash(), appCli.PathProject()))
 	utils.RemoveFolder(utils.MakeDirectoryString(appCli.PathProject(), ".git"))
-	s.Stop()
 
-	s.Start()
-	s.Suffix = " Copying file..."
 	// utils.CopyFile(fmt.Sprintf("%s%sapp.yaml.example", utils.GetPathSlash(), appCli.PathProject()), fmt.Sprintf("%s%sapp.yaml", utils.GetPathSlash(), appCli.PathProject()))
 	utils.CopyFile(utils.MakeDirectoryString(appCli.PathProject(), "app.yaml.example"), utils.MakeDirectoryString(appCli.PathProject(), "app.yaml"))
-	s.Stop()
 
 	err := utils.ReplaceTextInFolder(appCli.PathProject(), Replace, appCli.ModuleProject())
 	if err != nil {
@@ -206,10 +187,7 @@ func createProject(_ *cli.Context) {
 
 	handlers.RunnigMod(appCli.PathProject(), appCli.ModuleProject())
 
-	s.Start()
-	s.Suffix = " Running tidy..."
 	handlers.RunningTidy(appCli.PathProject())
-	s.Stop()
 	utils.MakeLine()
 
 	fmt.Println("Your project is ready to use.")
