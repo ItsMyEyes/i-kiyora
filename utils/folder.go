@@ -18,6 +18,7 @@ func RemoveFolder(dir string) {
 
 func CopyFile(src, dst string) {
 	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Copying File")
+	w.Start()
 	in, err := os.Open(src)
 	if err != nil {
 		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Cant copy file "+err.Error())

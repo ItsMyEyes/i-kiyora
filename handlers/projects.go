@@ -50,6 +50,7 @@ func CreateProject(_ *cli.Context) {
 	appCli.GithubName = answer
 
 	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Creating Projects")
+	w.Start()
 	utils.MakeLine()
 
 	fmt.Println("Your project name is " + appCli.NameProject)
@@ -99,6 +100,7 @@ func AddModular(ctx *cli.Context) {
 	args := ctx.Args()
 
 	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Creating Projects")
+	w.Start()
 	if len(args) == 0 {
 		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Please enter the module name.")
 		os.Exit(0)

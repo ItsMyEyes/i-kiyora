@@ -31,6 +31,7 @@ func GetNameModule(dir string) string {
 
 func azModule(dir string) {
 	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Adding Module AZ")
+	w.Start()
 	if !utils.CheckDir(utils.MakeDirectoryString(dir, "pkg", "logger")) {
 		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Module az cant install because logger")
 		return

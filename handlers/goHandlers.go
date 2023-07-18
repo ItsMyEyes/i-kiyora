@@ -17,6 +17,7 @@ import (
 
 func RunnigMod(dir string, mod string) {
 	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Create Modfd")
+	w.Start()
 	cmd := exec.Command("go", "mod", "init", mod)
 	cmd.Dir = dir
 
@@ -35,6 +36,7 @@ func RunnigMod(dir string, mod string) {
 
 func RunningTidy(dir string) {
 	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Running Tidy")
+	w.Start()
 	cmd := exec.Command("go", "mod", "tidy")
 	cmd.Dir = dir
 

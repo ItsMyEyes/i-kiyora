@@ -31,6 +31,7 @@ func ReplaceTextInFile(filePath, oldText, newText string) error {
 
 func ReplaceTextInFolder(rootFolder, oldText, newText string) {
 	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Replacing Text in Folder")
+	w.Start()
 	err := filepath.Walk(rootFolder, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
