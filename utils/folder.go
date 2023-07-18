@@ -1,10 +1,12 @@
 package utils
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"os"
+
+	"github.com/gernest/wow"
+	"github.com/gernest/wow/spin"
 )
 
 func RemoveFolder(dir string) {
@@ -12,26 +14,31 @@ func RemoveFolder(dir string) {
 	if cmd != nil {
 		log.Fatal(cmd)
 	}
-
-	fmt.Println("Sucess remove folder " + dir)
 }
 
-func CopyFile(src, dst string) error {
-	fmt.Println(src, dst)
+func CopyFile(src, dst string) {
+	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Copying File")
 	in, err := os.Open(src)
 	if err != nil {
-		return err
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Cant copy file "+err.Error())
+		os.Exit(0)
 	}
 	defer in.Close()
 
 	out, err := os.Create(dst)
 	if err != nil {
-		return err
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Cant copy file "+err.Error())
+		os.Exit(0)
 	}
 	defer out.Close()
 
 	_, err = io.Copy(out, in)
-	return err
+	if err != nil {
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Cant copy file "+err.Error())
+		os.Exit(0)
+	}
+
+	w.PersistWith(spin.Spinner{Frames: []string{"✅"}}, " File copied")
 }
 
 func ReadFile(path string) []byte {

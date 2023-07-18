@@ -1,11 +1,13 @@
 package utils
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/gernest/wow"
+	"github.com/gernest/wow/spin"
 )
 
 func ReplaceTextInFile(filePath, oldText, newText string) error {
@@ -27,7 +29,8 @@ func ReplaceTextInFile(filePath, oldText, newText string) error {
 	return nil
 }
 
-func ReplaceTextInFolder(rootFolder, oldText, newText string) error {
+func ReplaceTextInFolder(rootFolder, oldText, newText string) {
+	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Replacing Text in Folder")
 	err := filepath.Walk(rootFolder, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -45,15 +48,16 @@ func ReplaceTextInFolder(rootFolder, oldText, newText string) error {
 		// Replace text in the file
 		err = ReplaceTextInFile(path, oldText, newText)
 		if err != nil {
-			fmt.Printf("Error replacing text in file %s: %s\n", path, err.Error())
+			return err
 		}
 
 		return nil
 	})
 
 	if err != nil {
-		return err
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Module az cant install because "+err.Error())
+		return
 	}
 
-	return nil
+	w.PersistWith(spin.Spinner{Frames: []string{"✅"}}, " Text replacement completed.")
 }

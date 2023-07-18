@@ -3,26 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
+	"time"
 
-	"github.com/ItsMyEyes/install_kiyora/dto"
+	constants "github.com/ItsMyEyes/install_kiyora/constant"
 	"github.com/ItsMyEyes/install_kiyora/handlers"
-	"github.com/ItsMyEyes/install_kiyora/utils"
+	"github.com/gernest/wow"
+	"github.com/gernest/wow/spin"
 	"github.com/urfave/cli"
-)
-
-var (
-	// Version is the current version of the app
-	answer                     string
-	Kiyora                     = "Kiyora"
-	Version                    = "1.0.0"
-	MinimalVersionGolang       = "1.19.0"
-	ProjectLink                = "https://github.com/ItsMyEyes/kiyora_v2.git"
-	Replace                    = "github.com/ItsMyEyes/kiyora_v2"
-	MinimalVersionGolangInt, _ = strconv.Atoi(strings.Replace(MinimalVersionGolang, ".", "", -1))
-	BuildDate                  = "2023-06-19"
-	Commit                     = "now"
 )
 
 func main() {
@@ -31,7 +18,7 @@ func main() {
 	app.Usage = "run ikiyora"
 	app.Author = "ItsMyEyes - Andi"
 	app.UsageText = "ikiyora [command] [arguments...]"
-	app.Version = fmt.Sprintf("%s built on %s (commit: %s)", Version, BuildDate, Commit)
+	app.Version = fmt.Sprintf("%s built on %s (commit: %s)", constants.Version, constants.BuildDate, constants.Commit)
 	app.Description = "IKiyora is a installation tool for Kiyora"
 	app.Commands = []cli.Command{
 		{
@@ -39,163 +26,39 @@ func main() {
 			Description: "Creating a new project",
 			UsageText:   "Creating a new project",
 			Usage:       "Creating a new project",
-			Action:      createProject,
+			Action:      handlers.CreateProject,
 		},
 		{
 			Name:        "add",
 			Description: "Add Module / Adapters",
 			UsageText:   "Add Module / Adapters",
 			Usage:       "Add Module / Adapters",
-			Action:      addModule,
+			Action:      handlers.AddModular,
+		},
+		{
+			Name:        "loading",
+			Description: "Add Module / Adapters",
+			UsageText:   "Add Module / Adapters",
+			Usage:       "Add Module / Adapters",
+			Action:      testLoading,
 		},
 	}
 
 	app.Run(os.Args)
 }
 
-func addModule(ctx *cli.Context) {
-	args := ctx.Args()
-	if len(args) == 0 {
-		fmt.Println("You have not entered a module name.")
-		os.Exit(0)
-	}
+func testLoading(_ *cli.Context) {
+	w := wow.New(os.Stdout, spin.Get(spin.Runner), " Such Spins")
+	w.Start()
+	time.Sleep(2 * time.Second)
+	w.Text("Very emojis").Spinner(spin.Get(spin.Shark))
+	time.Sleep(2 * time.Second)
+	w.PersistWith(spin.Spinner{Frames: []string{"👍"}}, " Wow!")
 
-	moduleName := args[0]
-
-	dir, err := os.Getwd()
-	if err != nil {
-		fmt.Printf("Error getting current directory: %s\n", err.Error())
-		return
-	}
-	// adapter := dir + utils.GetPathSlash() + "adapter"
-	adapter := utils.MakeDirectoryString(dir, "adapter")
-	projectName := handlers.GetNameModule(dir)
-	// check directory cli running
-	if !utils.CheckDir(adapter) {
-		fmt.Println("❌ Project not found. Please run this command in the project directory.")
-		os.Exit(0)
-	}
-
-	// check directory adapter
-	if utils.CheckDir(utils.MakeDirectoryString(adapter, moduleName)) {
-		fmt.Println("❌ Adapter already exists.")
-		os.Exit(0)
-	}
-
-	err = handlers.AddModule(dir, moduleName)
-	if err != nil {
-		fmt.Printf("Error adding module: %s\n", err.Error())
-		return
-	}
-
-	err = utils.ReplaceTextInFolder(adapter, Replace, projectName)
-	if err != nil {
-		fmt.Printf("Error replacing text in folder: %s\n", err.Error())
-		return
-	}
-	fmt.Println("Text replacement completed.")
-
-	handlers.RunningTidy(dir)
-
-	utils.MakeLine()
-
-	fmt.Println("Your project is ready to use.")
-	fmt.Println("✅ You can check it")
-
-	utils.MakeLine()
-}
-
-func createProject(_ *cli.Context) {
-	var appCli dto.Cli
-	handlers.Logo(Kiyora, Version)
-
-	utils.MakeLine()
-
-	// make input cli
-	handlers.CheckVersionGolang(MinimalVersionGolangInt, MinimalVersionGolang)
-	// check git
-	handlers.CheckGit()
-
-	GoPath, checkIt := utils.Getenv("GOPATH")
-	if !checkIt {
-		fmt.Println("You need to set GOPATH")
-		os.Exit(0)
-	}
-	appCli.GoPath = GoPath
-	fmt.Println("Your GOPATH is " + appCli.GoPath)
-
-	utils.MakeLine()
-
-	answer = utils.MakeInputCli("What is the name of the project?")
-	if len(answer) == 0 {
-		fmt.Println("You have not created a new project.")
-		os.Exit(0)
-	}
-	appCli.NameProject = answer
-
-	answer = utils.MakeInputCli("What name your github? ")
-	if len(answer) == 0 {
-		fmt.Println("You have not created a new project.")
-		os.Exit(0)
-	}
-
-	appCli.GithubName = answer
-
-	utils.MakeLine()
-
-	fmt.Println("Your project name is " + appCli.NameProject)
-	fmt.Println("Your module is " + appCli.ModuleProject())
-	fmt.Println("Your path is " + appCli.PathProject())
-
-	utils.MakeLine()
-	answer = utils.MakeInputCli("Are you sure this is the correct information? (y/n)")
-	if !strings.Contains(strings.ToUpper(answer), "Y") {
-		fmt.Println("You have not created a new project.")
-		os.Exit(0)
-	}
-
-	if !utils.CheckDir(appCli.PathProject()) {
-		fmt.Println("Cloning project... ", appCli.PathProject())
-		handlers.CloningProject(ProjectLink, appCli.PathProject())
-
-	} else {
-		fmt.Println("Project already exists")
-		os.Exit(0)
-	}
-
-	// utils.RemoveFolder(fmt.Sprintf("%s%s.git", utils.GetPathSlash(), appCli.PathProject()))
-	utils.RemoveFolder(utils.MakeDirectoryString(appCli.PathProject(), ".git"))
-
-	// utils.CopyFile(fmt.Sprintf("%s%sapp.yaml.example", utils.GetPathSlash(), appCli.PathProject()), fmt.Sprintf("%s%sapp.yaml", utils.GetPathSlash(), appCli.PathProject()))
-	utils.CopyFile(utils.MakeDirectoryString(appCli.PathProject(), "app.yaml.example"), utils.MakeDirectoryString(appCli.PathProject(), "app.yaml"))
-
-	err := utils.ReplaceTextInFolder(appCli.PathProject(), Replace, appCli.ModuleProject())
-	if err != nil {
-		fmt.Printf("Error replacing text in folder: %s\n", err.Error())
-		return
-	}
-
-	fmt.Println("Text replacement completed.")
-
-	err = utils.ReplaceTextInFolder(appCli.PathProject(), "services_name", appCli.NameModule())
-	if err != nil {
-		fmt.Printf("Error replacing text in folder: %s\n", err.Error())
-		return
-	}
-
-	fmt.Println("Text replacement completed.")
-
-	fmt.Println("Running Mod...")
-	handlers.RunnigMod(appCli.PathProject(), appCli.ModuleProject())
-
-	fmt.Println("Running Tidy...")
-	handlers.RunningTidy(appCli.PathProject())
-	utils.MakeLine()
-
-	fmt.Println("Your project is ready to use.")
-	fmt.Println("You can run it with the following commands:\n")
-	fmt.Println("$ cd " + appCli.PathProject())
-	fmt.Println("$ go run ./cmd/http-server/main.go")
-
-	utils.MakeLine()
+	z := wow.New(os.Stdout, spin.Get(spin.Runner), " Such Spins")
+	z.Start()
+	time.Sleep(2 * time.Second)
+	z.Text("Very emojis").Spinner(spin.Get(spin.Shark))
+	time.Sleep(2 * time.Second)
+	z.PersistWith(spin.Spinner{Frames: []string{"👍"}}, " Wow!")
 }

@@ -11,9 +11,12 @@ import (
 
 	"github.com/ItsMyEyes/install_kiyora/utils"
 	"github.com/common-nighthawk/go-figure"
+	"github.com/gernest/wow"
+	"github.com/gernest/wow/spin"
 )
 
 func RunnigMod(dir string, mod string) {
+	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Create Modfd")
 	cmd := exec.Command("go", "mod", "init", mod)
 	cmd.Dir = dir
 
@@ -23,13 +26,15 @@ func RunnigMod(dir string, mod string) {
 	err := cmd.Run()
 
 	if err != nil {
-		log.Fatal(err)
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Cant init mod "+err.Error())
+		os.Exit(0)
 	}
 
-	fmt.Println("✅ Sucess running Mod" + out.String())
+	w.PersistWith(spin.Spinner{Frames: []string{"✅"}}, " Mod init")
 }
 
 func RunningTidy(dir string) {
+	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Running Tidy")
 	cmd := exec.Command("go", "mod", "tidy")
 	cmd.Dir = dir
 
@@ -39,13 +44,15 @@ func RunningTidy(dir string) {
 	err := cmd.Run()
 
 	if err != nil {
-		log.Fatal(err)
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Cant running tidy "+err.Error())
+		os.Exit(0)
 	}
 
-	fmt.Println("\n ✅ Sucess running tidy" + out.String())
+	w.PersistWith(spin.Spinner{Frames: []string{"✅"}}, " Tidy")
 }
 
-func CloningProject(project string, nameProject string) {
+func CloningProject(w *wow.Wow, project string, nameProject string) {
+	w.Text("Cloning project").Spinner(spin.Get(spin.Shark))
 	cmd := exec.Command("git", "clone", project, nameProject)
 
 	var out bytes.Buffer
@@ -54,10 +61,11 @@ func CloningProject(project string, nameProject string) {
 	err := cmd.Run()
 
 	if err != nil {
-		log.Fatal(err)
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Cant clone project "+err.Error())
+		os.Exit(0)
 	}
 
-	fmt.Println("\n ✅ Sucess cloning" + out.String())
+	w.PersistWith(spin.Spinner{Frames: []string{"✅"}}, " Project cloned")
 }
 
 func Logo(Name string, Version string) {

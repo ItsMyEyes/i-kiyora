@@ -1,23 +1,24 @@
 package handlers
 
 import (
-	"errors"
-	"fmt"
+	"os"
 	"strings"
 
 	"github.com/ItsMyEyes/install_kiyora/utils"
+	"github.com/gernest/wow"
+	"github.com/gernest/wow/spin"
 )
 
 var (
 	AZ = "https://github.com/ItsMyEyes/az"
 )
 
-func AddModule(dir, name string) error {
+func AddModule(dir, name string) {
 	switch name {
 	case "az":
-		return azModule(dir)
+		azModule(dir)
+		return
 	}
-	return errors.New("Module not found")
 }
 
 func GetNameModule(dir string) string {
@@ -28,21 +29,22 @@ func GetNameModule(dir string) string {
 	return strings.Trim(mod, "\r\n")
 }
 
-func azModule(dir string) error {
-	fmt.Println("📦 Installing AZ Module")
+func azModule(dir string) {
+	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Adding Module AZ")
 	if !utils.CheckDir(utils.MakeDirectoryString(dir, "pkg", "logger")) {
-		return errors.New("Module az cant install because logger")
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Module az cant install because logger")
+		return
 	}
 
 	if !utils.CheckDir(utils.MakeDirectoryString(dir, "pkg", "util")) {
-		return errors.New("Module az cant install because utils")
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Module az cant install because util")
+		return
 	}
 
 	if !utils.CheckDir(utils.MakeDirectoryString(dir, "adapter", "az")) {
-		return errors.New("Module az cant install because you already have az module")
+		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Module az cant install because adapter")
+		return
 	}
 
-	CloningProject(AZ, utils.MakeDirectoryString(dir, "adapter", "az"))
-
-	return nil
+	CloningProject(w, AZ, utils.MakeDirectoryString(dir, "adapter", "az"))
 }
