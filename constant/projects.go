@@ -6,11 +6,9 @@ import (
 )
 
 var (
-
-	// Version is the current version of the app
 	Answer                     string
 	Kiyora                     = "Kiyora"
-	Version                    = "1.0.0"
+	Version                    = "v0.2.8"
 	MinimalVersionGolang       = "1.19.0"
 	ProjectLink                = "https://github.com/ItsMyEyes/kiyora_v2.git"
 	Replace                    = "github.com/ItsMyEyes/kiyora_v2"

@@ -25,9 +25,18 @@ func CreateProject(_ *cli.Context) {
 	// check git
 	CheckGit()
 
+	w := wow.New(os.Stdout, spin.Get(spin.Grenade), " Checking Version")
+	w.Start()
+	checkUpdate, version := CheckForUpdate()
+	if checkUpdate {
+		w.PersistWith(spin.Spinner{Frames: []string{"😁"}}, fmt.Sprintf(" New version available: %s, Please update with command i-kiyora update", version))
+	} else {
+		w.PersistWith(spin.Spinner{Frames: []string{"✅ "}}, " You are using the latest version.")
+	}
+
 	GoPath, checkIt := utils.Getenv("GOPATH")
 	if !checkIt {
-		fmt.Println("You need to set GOPATH")
+		log.Fatal("You need to set GOPATH")
 		os.Exit(0)
 	}
 	appCli.GoPath = GoPath
@@ -49,7 +58,7 @@ func CreateProject(_ *cli.Context) {
 
 	appCli.GithubName = answer
 
-	w := wow.New(os.Stdout, spin.Get(spin.Shark), " Creating Projects")
+	w = wow.New(os.Stdout, spin.Get(spin.Shark), " Creating Projects")
 	// w.Start()
 	utils.MakeLine()
 

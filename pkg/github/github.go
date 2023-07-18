@@ -1,4 +1,4 @@
-package main
+package github_pkg
 
 import (
 	"archive/tar"
@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,98 +16,108 @@ import (
 	"golang.org/x/oauth2"
 )
 
-func main() {
-	oss := runtime.GOOS
-	arch := runtime.GOARCH
+var (
+	oss  = runtime.GOOS
+	arch = runtime.GOARCH
 	// Set your GitHub personal access token here
-	token := "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"
+	token = "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"
 
 	// Specify the repository details
-	owner := "ItsMyEyes"
-	repo := "i-kiyora"
-
-	checkDir := "C:\\i-kiyora"
-	if _, err := os.Stat(checkDir); os.IsNotExist(err) {
-		log.Fatal("PATH not found, are you custom PATH? you must run with --source")
-	}
-
-	split := os.Getenv("PATH")
-	if !strings.Contains(split, fmt.Sprintf("%s\\", checkDir)) {
-		log.Fatal("PATH not found, are you custom PATH? you must run with --source")
-		return
-	}
-
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
+	owner = "ItsMyEyes"
+	repo  = "i-kiyora"
+	ctx   = context.Background()
+	ts    = oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
-	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
+	tc     = oauth2.NewClient(ctx, ts)
+	client = github.NewClient(tc)
+)
+
+type Result struct {
+	RepoRelease *github.RepositoryRelease
+}
+
+func GetLatest() (*Result, error) {
 	release, _, err := client.Repositories.GetLatestRelease(ctx, owner, repo)
 	if err != nil {
-		fmt.Printf("Error retrieving release: %v\n", err)
-		return
+		return nil, err
 	}
 
-	// Specify the name of the binary file in the release assets
-	assetName := fmt.Sprintf("i-kiyora_%s_%s_%s.tar.gz", strings.Replace(*release.TagName, "v", "", -1), oss, arch)
+	return &Result{
+		RepoRelease: release,
+	}, nil
+}
 
-	// Find the asset by name
+func (release *Result) GetAssetsName() string {
+	assetName := fmt.Sprintf("i-kiyora_%s_%s_%s.tar.gz", strings.Replace(*release.RepoRelease.TagName, "v", "", -1), oss, arch)
+	return assetName
+}
+
+func (release *Result) GetAssets() *github.ReleaseAsset {
 	var asset *github.ReleaseAsset
-	for _, a := range release.Assets {
-		fmt.Println(a.GetName())
-		if strings.EqualFold(a.GetName(), assetName) {
+	for _, a := range release.RepoRelease.Assets {
+		if strings.EqualFold(a.GetName(), release.GetAssetsName()) {
 			asset = &a
 			break
 		}
 	}
+	return asset
+}
 
-	if asset == nil {
-		fmt.Printf("Asset '%s' not found in the release.\n", assetName)
-		return
-	}
-
-	// // Download the asset file
+func (release *Result) DownloadAndCopy() error {
+	asset := release.GetAssets()
 	resp, err := http.Get(asset.GetBrowserDownloadURL())
 	if err != nil {
-		fmt.Printf("Error downloading asset: %v\n", err)
-		return
+		return err
 	}
 	defer resp.Body.Close()
 
 	// // Save the asset file locally
-	file, err := os.Create(assetName)
+	file, err := os.Create(release.GetAssetsName())
 	if err != nil {
-		fmt.Printf("Error creating file: %v\n", err)
-		return
+		return err
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
-		fmt.Printf("Error saving file: %v\n", err)
-		return
+		return err
 	}
 
+	return nil
+}
+
+func (release *Result) Extract() error {
 	// // Extract the tar.gz archive
-	err = extractTarGz(assetName, "./")
+	err := extractTarGz(release.GetAssetsName(), "./")
 	if err != nil {
-		fmt.Printf("Error extracting archive: %v\n", err)
-		return
+		return fmt.Errorf("error extracting archive: %v\n", err)
 	}
 	// // Make the binary executable
-	err = os.Chmod(assetName, 0755)
+	err = os.Chmod(release.GetAssetsName(), 0755)
 	if err != nil {
-		fmt.Printf("Error making binary executable: %v\n", err)
-		return
+		return fmt.Errorf("error making binary executable: %v\n", err)
 	}
 
-	// move file
-	err = os.Rename("./i-kiyora.exe", checkDir+"\\i-kiyora.exe")
+	return nil
+}
+
+func (release *Result) Move(source string) error {
+	err := os.Rename("./i-kiyora.exe", source+"\\i-kiyora.exe")
 	if err != nil {
-		fmt.Printf("Error moving file: %v\n", err)
-		return
+		return fmt.Errorf("error moving file: %v\n", err)
 	}
+
+	return nil
+}
+
+func (release *Result) DeleteArchinve() error {
+	err := os.Remove(release.GetAssetsName())
+	if err != nil {
+		return fmt.Errorf("error deleting archive: %v\n", err)
+	}
+
+	return nil
 }
 
 func extractTarGz(archivePath string, destinationDir string) error {

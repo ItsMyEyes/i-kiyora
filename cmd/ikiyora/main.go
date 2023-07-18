@@ -42,6 +42,20 @@ func main() {
 			Usage:       "Add Module / Adapters",
 			Action:      testLoading,
 		},
+		{
+			Name:        "update",
+			Description: "Update ikiyora",
+			UsageText:   "Update ikiyora",
+			Usage:       "Update ikiyora",
+			Action:      handlers.UpdateBinary,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:   "path",
+					Usage:  "path of ikiyora",
+					EnvVar: "IKIYORA_PATH",
+				},
+			},
+		},
 	}
 
 	app.Run(os.Args)
