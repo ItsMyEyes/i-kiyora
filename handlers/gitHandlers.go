@@ -106,7 +106,7 @@ func GitSSLIATLinux(urlCa string, pathSSL string) {
 	}
 
 	if pathSSL == "" {
-		pathSSL = "/usr/local/share/ca-certificates/"
+		pathSSL = "/usr/local/share/ca-certificates/IAT-ROOT.crt"
 	}
 
 	err = copyFile(readFIle, pathSSL)
