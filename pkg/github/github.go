@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -141,11 +142,28 @@ func (release *Result) Extract() error {
 }
 
 func (release *Result) Move(source string) error {
-	err := os.Rename("./i-kiyora.exe", source+"\\i-kiyora.exe")
-	if err != nil {
-		return fmt.Errorf("error moving file: %v\n", err)
+	name := "i-kiyora.exe"
+	if OSS != "windows" {
+		name = "i-kiyora"
+	}
+	if OSS == "windows" {
+		err := os.Rename(name, filepath.Join(source, name))
+		if err != nil {
+			return fmt.Errorf("error moving file: %v\n", err)
+		}
 	}
 
+	if OSS != "windows" {
+		cmd := exec.Command("mv", name, filepath.Join(source, name))
+
+		// Attempt to run the command
+		err := cmd.Run()
+
+		// Check the error returned by the command
+		if err != nil {
+			return fmt.Errorf("error moving file: %v\n", err)
+		}
+	}
 	return nil
 }
 

@@ -7,26 +7,33 @@ import (
 	"strings"
 
 	github_pkg "github.com/ItsMyEyes/install_kiyora/pkg/github"
+	"github.com/ItsMyEyes/install_kiyora/utils"
 	"github.com/gernest/wow"
 	"github.com/gernest/wow/spin"
 	"github.com/urfave/cli"
 )
 
 func CheckPath(source string, custom bool) (string, error) {
-	checkDir := "C:\\i-kiyora"
+	if custom && source == "" {
+		return "", errors.New("PATH not found, are you custom PATH? you must run with --source")
+	}
+	checkDir := source
+	if source == "" {
+		checkDir = "C:\\i-kiyora"
+	}
 	if _, err := os.Stat(checkDir); os.IsNotExist(err) {
 		return "", errors.New("PATH not found, are you custom PATH? you must run with --source")
 	}
 
 	if !custom {
 		split := os.Getenv("PATH")
-		if !strings.Contains(split, fmt.Sprintf("%s\\", checkDir)) {
+		if !strings.Contains(split, fmt.Sprintf("%s%s", checkDir, utils.GetPathSlash())) {
 			return "", errors.New("PATH not found, are you custom PATH? you must run with --source")
 		}
-		return fmt.Sprintf("%s\\", checkDir), nil
+		return fmt.Sprintf("%s%s", checkDir, utils.GetPathSlash()), nil
 	}
 
-	return fmt.Sprintf("%s\\", source), nil
+	return fmt.Sprintf("%s%s", source, utils.GetPathSlash()), nil
 }
 
 func UpdateBinary(d *cli.Context) {
