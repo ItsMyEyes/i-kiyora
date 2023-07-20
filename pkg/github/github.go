@@ -4,8 +4,10 @@ import (
 	"archive/tar"
 	"compress/gzip"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -20,14 +22,14 @@ var (
 	OSS = runtime.GOOS
 	Arc = runtime.GOARCH
 	// Set your GitHub personal access token here
-	token = "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"
+	token = ""
 
 	// Specify the repository details
 	owner = "ItsMyEyes"
 	repo  = "i-kiyora"
 	ctx   = context.Background()
 	ts    = oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
+		&oauth2.Token{},
 	)
 	tc     = oauth2.NewClient(ctx, ts)
 	client = github.NewClient(tc)
@@ -37,12 +39,48 @@ type Result struct {
 	RepoRelease *github.RepositoryRelease
 }
 
-func GetLatest() (*Result, error) {
-	release, _, err := client.Repositories.GetLatestRelease(ctx, owner, repo)
+func ReleaseLatest() (res *github.RepositoryRelease) {
+	// http client with header
+	req, err := http.NewRequest("GET", "https://api.github.com/repos/ItsMyEyes/i-kiyora/releases/latest", nil)
 	if err != nil {
-		return nil, err
+		fmt.Println("Error creating request:", err)
+		return
 	}
 
+	req.Header.Add("Accept", "application/vnd.github+json")
+	req.Header.Add("User-Agent", "golang-http-client")
+	req.Header.Add("X-GitHub-Api-Version", "2022-11-28")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending request:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// read response body
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading response:", err)
+		return
+	}
+	err = json.Unmarshal(body, &res)
+	if err != nil {
+		fmt.Println("Error unmarshalling:", err)
+		return
+	}
+
+	return
+}
+
+func GetLatest() (*Result, error) {
+	// release, _, err := client.Repositories.GetLatestRelease(ctx, owner, repo)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	release := ReleaseLatest()
 	return &Result{
 		RepoRelease: release,
 	}, nil
