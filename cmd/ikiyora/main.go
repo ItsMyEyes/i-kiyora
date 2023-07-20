@@ -56,6 +56,25 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:        "git-ssl-iat",
+			Description: "Update SSL IAT",
+			UsageText:   "Update SSL IAT",
+			Usage:       "Update SSL IAT",
+			Action:      handlers.GitSSL,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:   "url-ca",
+					Usage:  "path of ikiyora",
+					EnvVar: "IKIYORA_PATH",
+				},
+				cli.StringFlag{
+					Name:   "config-path",
+					Usage:  "config ssl of git",
+					EnvVar: "IKIYORA_PATH",
+				},
+			},
+		},
 	}
 
 	app.Run(os.Args)

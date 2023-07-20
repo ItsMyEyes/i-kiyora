@@ -38,7 +38,7 @@ func MakeLine() {
 	fmt.Println("\n" + line + "\n")
 }
 
-func getPathSlash() string {
+func GetPathSlash() string {
 	if os.PathSeparator == '\\' {
 		return "\\"
 	}
@@ -52,7 +52,7 @@ func MakeDirectoryString(dir ...string) string {
 			result += d
 			break
 		}
-		result += d + getPathSlash()
+		result += d + GetPathSlash()
 	}
 	return result
 }

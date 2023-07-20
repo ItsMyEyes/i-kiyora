@@ -17,8 +17,8 @@ import (
 )
 
 var (
-	oss  = runtime.GOOS
-	arch = runtime.GOARCH
+	OSS = runtime.GOOS
+	Arc = runtime.GOARCH
 	// Set your GitHub personal access token here
 	token = "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"
 
@@ -49,7 +49,7 @@ func GetLatest() (*Result, error) {
 }
 
 func (release *Result) GetAssetsName() string {
-	assetName := fmt.Sprintf("i-kiyora_%s_%s_%s.tar.gz", strings.Replace(*release.RepoRelease.TagName, "v", "", -1), oss, arch)
+	assetName := fmt.Sprintf("i-kiyora_%s_%s_%s.tar.gz", strings.Replace(*release.RepoRelease.TagName, "v", "", -1), OSS, Arc)
 	return assetName
 }
 
