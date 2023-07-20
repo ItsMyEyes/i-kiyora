@@ -20,7 +20,7 @@ var (
 	OSS = runtime.GOOS
 	Arc = runtime.GOARCH
 	// Set your GitHub personal access token here
-	token = "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"
+	token = "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"
 
 	// Specify the repository details
 	owner = "ItsMyEyes"

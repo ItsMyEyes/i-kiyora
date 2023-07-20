@@ -20,7 +20,7 @@ func ReleaseLatest() (res *dto.ResponseRelease) {
 
 	req.Header.Add("Accept", "application/vnd.github+json")
 	req.Header.Add("User-Agent", "golang-http-client")
-	req.Header.Add("Authorization", "Bearer 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")
+	req.Header.Add("Authorization", "Bearer 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")
 	req.Header.Add("X-GitHub-Api-Version", "2022-11-28")
 
 	client := &http.Client{}
