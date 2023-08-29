@@ -42,10 +42,10 @@ func azModule(dir string) {
 		return
 	}
 
-	if !utils.CheckDir(utils.MakeDirectoryString(dir, "adapter", "az")) {
-		w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Module az cant install because adapter")
-		return
-	}
+	// if !utils.CheckDir(utils.MakeDirectoryString(dir, "adapter", "az")) {
+	// 	w.PersistWith(spin.Spinner{Frames: []string{"❌"}}, " Module az cant install because adapter")
+	// 	return
+	// }
 
 	CloningProject(w, AZ, utils.MakeDirectoryString(dir, "adapter", "az"))
 }
