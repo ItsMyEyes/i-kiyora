@@ -8,7 +8,7 @@ import (
 var (
 	Answer                     string
 	Kiyora                     = "Kiyora"
-	Version                    = "v0.2.14"
+	Version                    = "v0.3.3"
 	MinimalVersionGolang       = "1.19.0"
 	ProjectLink                = "https://github.com/ItsMyEyes/kiyora_v3.git"
 	Replace                    = "github.com/ItsMyEyes/kiyora_v3"
