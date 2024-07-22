@@ -84,8 +84,8 @@ func CreateProject(_ *cli.Context) {
 	// utils.RemoveFolder(fmt.Sprintf("%s%s.git", utils.GetPathSlash(), appCli.PathProject()))
 	utils.RemoveFolder(utils.MakeDirectoryString(appCli.PathProject(), ".git"))
 
-	// utils.CopyFile(fmt.Sprintf("%s%sapp.yaml.example", utils.GetPathSlash(), appCli.PathProject()), fmt.Sprintf("%s%sapp.yaml", utils.GetPathSlash(), appCli.PathProject()))
-	utils.CopyFile(utils.MakeDirectoryString(appCli.PathProject(), "app.yaml.example"), utils.MakeDirectoryString(appCli.PathProject(), "app.yaml"))
+	// utils.CopyFile(fmt.Sprintf("%s%sconfig.yaml.example", utils.GetPathSlash(), appCli.PathProject()), fmt.Sprintf("%s%sapp.yaml", utils.GetPathSlash(), appCli.PathProject()))
+	utils.CopyFile(utils.MakeDirectoryString(appCli.PathProject(), "config.yaml.example"), utils.MakeDirectoryString(appCli.PathProject(), "config.yaml"))
 
 	utils.ReplaceTextInFolder(appCli.PathProject(), constants.Replace, appCli.ModuleProject())
 
